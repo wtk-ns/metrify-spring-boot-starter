@@ -6,19 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import io.wouns.metrify.annotation.BusinessMetric;
-import io.wouns.metrify.annotation.MetricTag;
-import io.wouns.metrify.autoconfigure.MetrifyAutoConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
-@SpringBootTest(classes = BusinessMetricAspectTest.TestConfig.class)
+@SpringBootTest(classes = BusinessMetricTestConfig.class)
 class BusinessMetricAspectTest {
 
   @Autowired
@@ -126,46 +118,5 @@ class BusinessMetricAspectTest {
         .counter();
     assertThat(counter).isNotNull();
     assertThat(counter.count()).isEqualTo(2.0);
-  }
-
-  @Configuration(proxyBeanMethods = false)
-  @EnableAspectJAutoProxy
-  @ImportAutoConfiguration(MetrifyAutoConfiguration.class)
-  static class TestConfig {
-
-    @Bean
-    MeterRegistry meterRegistry() {
-      return new SimpleMeterRegistry();
-    }
-
-    @Bean
-    BusinessTestService businessTestService() {
-      return new BusinessTestService();
-    }
-  }
-
-  static class BusinessTestService {
-
-    @BusinessMetric("order.process")
-    public String processOrder() {
-      return "done";
-    }
-
-    @BusinessMetric("failing.process")
-    public void failingProcess() {
-      throw new RuntimeException("fail");
-    }
-
-    @BusinessMetric(value = "tagged.process", tags = {"env", "test"})
-    public void taggedProcess() {}
-
-    @BusinessMetric("customer.process")
-    public void spelTaggedProcess(@MetricTag(key = "tier") String tier) {}
-
-    @BusinessMetric(value = "described.process", description = "Order processing metric")
-    public void describedProcess() {}
-
-    @BusinessMetric("multi.call")
-    public void multiCallProcess() {}
   }
 }

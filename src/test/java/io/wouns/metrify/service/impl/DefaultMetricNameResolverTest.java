@@ -29,7 +29,7 @@ class DefaultMetricNameResolverTest {
 
     String name = resolver.resolve("", joinPoint);
 
-    assertThat(name).isEqualTo("TestService.processOrder");
+    assertThat(name).isEqualTo("MetricNameResolverTestService.processOrder");
   }
 
   @Test
@@ -49,7 +49,7 @@ class DefaultMetricNameResolverTest {
 
     String name = resolver.resolve("", joinPoint);
 
-    assertThat(name).isEqualTo("myapp.TestService.processOrder");
+    assertThat(name).isEqualTo("myapp.MetricNameResolverTestService.processOrder");
   }
 
   @Test
@@ -69,17 +69,13 @@ class DefaultMetricNameResolverTest {
   }
 
   private JoinPoint mockJoinPoint() throws Exception {
-    Method method = TestService.class.getMethod("processOrder");
+    Method method = MetricNameResolverTestService.class.getMethod("processOrder");
     MethodSignature signature = mock(MethodSignature.class);
     when(signature.getMethod()).thenReturn(method);
-    when(signature.getDeclaringType()).thenReturn(TestService.class);
+    when(signature.getDeclaringType()).thenReturn(MetricNameResolverTestService.class);
 
     JoinPoint joinPoint = mock(JoinPoint.class);
     when(joinPoint.getSignature()).thenReturn(signature);
     return joinPoint;
-  }
-
-  public static class TestService {
-    public void processOrder() {}
   }
 }

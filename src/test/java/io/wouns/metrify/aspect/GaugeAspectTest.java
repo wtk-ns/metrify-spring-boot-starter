@@ -4,23 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import io.wouns.metrify.annotation.MetricGauge;
-import io.wouns.metrify.annotation.MetricTag;
-import io.wouns.metrify.autoconfigure.MetrifyAutoConfiguration;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.stereotype.Component;
 
-@SpringBootTest(classes = GaugeAspectTest.TestConfig.class)
+@SpringBootTest(classes = GaugeTestConfig.class)
 class GaugeAspectTest {
 
   @Autowired
@@ -103,58 +91,5 @@ class GaugeAspectTest {
     Gauge gauge = registry.find("temperature.current").gauge();
     assertThat(gauge).isNotNull();
     assertThat(gauge.getId().getBaseUnit()).isEqualTo("celsius");
-  }
-
-  @Configuration(proxyBeanMethods = false)
-  @EnableAspectJAutoProxy
-  @ImportAutoConfiguration(MetrifyAutoConfiguration.class)
-  static class TestConfig {
-
-    @Bean
-    MeterRegistry meterRegistry() {
-      return new SimpleMeterRegistry();
-    }
-
-    @Bean
-    GaugeTestService gaugeTestService() {
-      return new GaugeTestService();
-    }
-  }
-
-  @Component
-  static class GaugeTestService {
-
-    @MetricGauge(
-        value = "temperature.current",
-        description = "Current body temperature",
-        unit = "celsius")
-    public double currentTemperature() {
-      return 36.6;
-    }
-
-    @MetricGauge("dynamic.gauge")
-    public double dynamicValue(double value) {
-      return value;
-    }
-
-    @MetricGauge("active.users")
-    public Collection<String> activeUsers() {
-      return List.of("alice", "bob", "charlie");
-    }
-
-    @MetricGauge("cache.entries")
-    public Map<String, Object> cacheEntries() {
-      return Map.of("key1", "val1", "key2", "val2");
-    }
-
-    @MetricGauge(value = "tagged.gauge", tags = {"env", "test"})
-    public double taggedGauge() {
-      return 42.0;
-    }
-
-    @MetricGauge("region.gauge")
-    public double spelTaggedGauge(@MetricTag(key = "region") String region) {
-      return 99.0;
-    }
   }
 }

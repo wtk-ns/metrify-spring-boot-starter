@@ -24,7 +24,8 @@ public class DefaultTagExtractor implements TagExtractor {
 
   private List<Tag> parseStaticTags(String[] staticTags) {
     if (staticTags.length % 2 != 0) {
-      throw new IllegalArgumentException("Static tags must be key-value pairs (even number of elements)");
+      throw new IllegalArgumentException(
+          "Static tags must be key-value pairs (even number of elements)");
     }
 
     List<Tag> tags = new ArrayList<>(staticTags.length / 2);

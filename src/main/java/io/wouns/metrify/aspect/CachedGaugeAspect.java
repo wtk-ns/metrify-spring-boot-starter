@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.wouns.metrify.annotation.CachedGauge;
 import io.wouns.metrify.model.dto.CachedValue;
+import io.wouns.metrify.model.dto.GaugeEntry;
 import io.wouns.metrify.service.MetricNameResolver;
 import io.wouns.metrify.service.TagExtractor;
 import java.util.List;
@@ -79,5 +80,4 @@ public class CachedGaugeAspect {
     return key.toString();
   }
 
-  private record GaugeEntry(AtomicReference<CachedValue> valueRef, long ttlMillis) {}
 }

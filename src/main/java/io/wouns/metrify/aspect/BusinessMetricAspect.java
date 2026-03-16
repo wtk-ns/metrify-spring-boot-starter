@@ -7,8 +7,11 @@ import io.micrometer.core.instrument.Timer;
 import io.wouns.metrify.annotation.BusinessMetric;
 import io.wouns.metrify.service.MetricNameResolver;
 import io.wouns.metrify.service.TagExtractor;
+import io.wouns.metrify.utility.AsyncTypeDetector;
+import io.wouns.metrify.utility.ReactiveMetricHelper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletionStage;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -36,6 +39,7 @@ public class BusinessMetricAspect {
     String baseName = nameResolver.resolve(businessMetric.value(), joinPoint);
     List<Tag> baseTags = tagExtractor.extract(businessMetric.tags(), joinPoint);
     MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+    String description = businessMetric.description();
 
     List<Tag> autoTags = new ArrayList<>(baseTags);
     autoTags.add(Tag.of("class", signature.getDeclaringType().getSimpleName()));
@@ -45,10 +49,36 @@ public class BusinessMetricAspect {
 
     try {
       Object result = joinPoint.proceed();
-      record(baseName, businessMetric.description(), autoTags, sample, "success", "none");
+
+      if (result instanceof CompletionStage<?> completionStage) {
+        return completionStage.whenComplete((value, throwable) -> {
+          if (throwable != null) {
+            record(baseName, description, autoTags, sample,
+                "failure", throwable.getClass().getSimpleName());
+          } else {
+            record(baseName, description, autoTags, sample, "success", "none");
+          }
+        });
+      }
+
+      if (AsyncTypeDetector.isMono(result)) {
+        return ReactiveMetricHelper.wrapCounterMono(result,
+            () -> record(baseName, description, autoTags, sample, "success", "none"),
+            ex -> record(baseName, description, autoTags, sample,
+                "failure", ex.getClass().getSimpleName()));
+      }
+
+      if (AsyncTypeDetector.isFlux(result)) {
+        return ReactiveMetricHelper.wrapCounterFlux(result,
+            () -> record(baseName, description, autoTags, sample, "success", "none"),
+            ex -> record(baseName, description, autoTags, sample,
+                "failure", ex.getClass().getSimpleName()));
+      }
+
+      record(baseName, description, autoTags, sample, "success", "none");
       return result;
     } catch (Throwable ex) {
-      record(baseName, businessMetric.description(), autoTags, sample, "failure",
+      record(baseName, description, autoTags, sample, "failure",
           ex.getClass().getSimpleName());
       throw ex;
     }

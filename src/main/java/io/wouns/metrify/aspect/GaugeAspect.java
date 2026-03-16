@@ -6,9 +6,11 @@ import io.micrometer.core.instrument.Tag;
 import io.wouns.metrify.annotation.MetricGauge;
 import io.wouns.metrify.service.MetricNameResolver;
 import io.wouns.metrify.service.TagExtractor;
+import io.wouns.metrify.utility.AsyncTypeDetector;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import org.aspectj.lang.JoinPoint;
@@ -37,9 +39,23 @@ public class GaugeAspect {
       pointcut = "@annotation(metricGauge)",
       returning = "result")
   public void afterGaugedMethod(JoinPoint joinPoint, MetricGauge metricGauge, Object result) {
-    double value = extractDoubleValue(result);
     String name = nameResolver.resolve(metricGauge.value(), joinPoint);
     List<Tag> tags = tagExtractor.extract(metricGauge.tags(), joinPoint);
+
+    if (result instanceof CompletionStage<?> completionStage) {
+      completionStage.thenAccept(value -> recordGauge(name, metricGauge, tags, value));
+      return;
+    }
+
+    if (AsyncTypeDetector.isMono(result) || AsyncTypeDetector.isFlux(result)) {
+      return;
+    }
+
+    recordGauge(name, metricGauge, tags, result);
+  }
+
+  private void recordGauge(String name, MetricGauge metricGauge, List<Tag> tags, Object result) {
+    double value = extractDoubleValue(result);
     String gaugeKey = buildGaugeKey(name, tags);
 
     gaugeValues.computeIfAbsent(gaugeKey, key -> {

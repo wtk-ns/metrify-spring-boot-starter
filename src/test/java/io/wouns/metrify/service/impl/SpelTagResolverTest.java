@@ -5,7 +5,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import io.micrometer.core.instrument.Tag;
-import io.wouns.metrify.annotation.MetricTag;
 import java.lang.reflect.Method;
 import java.util.List;
 import org.aspectj.lang.JoinPoint;
@@ -74,7 +73,8 @@ class SpelTagResolverTest {
   }
 
   private JoinPoint mockJoinPoint(String methodName, Object[] args) throws Exception {
-    Method method = TestTarget.class.getMethod(methodName, getParameterTypes(methodName));
+    Method method =
+        SpelTagResolverTestTarget.class.getMethod(methodName, getParameterTypes(methodName));
     MethodSignature signature = mock(MethodSignature.class);
     when(signature.getMethod()).thenReturn(method);
     when(signature.getParameterNames()).thenReturn(getParameterNames(method));
@@ -99,21 +99,5 @@ class SpelTagResolverTest {
       names[i] = params[i].getName();
     }
     return names;
-  }
-
-  public static class TestTarget {
-
-    public void taggedByToString(@MetricTag(key = "param") String input) {}
-
-    public void taggedByLiteral(@MetricTag(key = "region", value = "us-east-1") String input) {}
-
-    public void taggedBySpel(
-        @MetricTag(key = "upper", expression = "#input.toUpperCase()") String input) {}
-
-    public void multipleParams(
-        @MetricTag(key = "customerId") String customerId,
-        @MetricTag(key = "region") String region) {}
-
-    public void noTags(String input) {}
   }
 }

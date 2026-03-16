@@ -10,7 +10,6 @@ import io.wouns.metrify.aspect.SummaryAspect;
 import io.wouns.metrify.configuration.MetrifyProperties;
 import io.wouns.metrify.service.MetricNameResolver;
 import io.wouns.metrify.service.TagExtractor;
-import io.wouns.metrify.service.TagResolver;
 import io.wouns.metrify.service.impl.DefaultMetricNameResolver;
 import io.wouns.metrify.service.impl.DefaultTagExtractor;
 import io.wouns.metrify.service.impl.SpelTagResolver;
@@ -37,19 +36,19 @@ public class MetrifyAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean
-  public TagResolver metrifyTagResolver() {
+  public SpelTagResolver metrifyTagResolver() {
     return new SpelTagResolver();
   }
 
   @Bean
   @ConditionalOnMissingBean
-  public MetricNameResolver metrifyMetricNameResolver(MetrifyProperties properties) {
+  public DefaultMetricNameResolver metrifyMetricNameResolver(MetrifyProperties properties) {
     return new DefaultMetricNameResolver(properties);
   }
 
   @Bean
   @ConditionalOnMissingBean
-  public TagExtractor metrifyTagExtractor(TagResolver tagResolver) {
+  public DefaultTagExtractor metrifyTagExtractor(SpelTagResolver tagResolver) {
     return new DefaultTagExtractor(tagResolver);
   }
 
