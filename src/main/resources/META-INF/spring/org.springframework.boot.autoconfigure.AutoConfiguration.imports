@@ -1,2 +1,3 @@
 io.wouns.metrify.autoconfigure.MetrifyAutoConfiguration
 io.wouns.metrify.autoconfigure.MetrifyValidationAutoConfiguration
+io.wouns.metrify.autoconfigure.MetrifyGrafanaAutoConfiguration
