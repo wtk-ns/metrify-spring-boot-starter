@@ -4,8 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.wouns.metrify.aspect.GaugeAspect;
+import io.wouns.metrify.aspect.MetricGaugeBeanPostProcessor;
 import io.wouns.metrify.configuration.MetrifyProperties;
 import io.wouns.metrify.model.enums.ValidationMode;
+import io.wouns.metrify.service.MetricNameResolver;
+import io.wouns.metrify.service.TagExtractor;
+import io.wouns.metrify.service.TagResolver;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;
@@ -59,6 +64,31 @@ class MetrifyAutoConfigurationTest {
               assertThat(props.getPrefix()).isEqualTo("app");
               assertThat(props.getValidation().getMode())
                   .isEqualTo(ValidationMode.FAIL);
+            });
+  }
+
+  @Test
+  void registersBeans() {
+    contextRunner.run(
+        context -> {
+          assertThat(context).hasSingleBean(TagResolver.class);
+          assertThat(context).hasSingleBean(MetricNameResolver.class);
+          assertThat(context).hasSingleBean(TagExtractor.class);
+          assertThat(context).hasSingleBean(GaugeAspect.class);
+          assertThat(context).hasSingleBean(MetricGaugeBeanPostProcessor.class);
+        });
+  }
+
+  @Test
+  void userCanOverrideGaugeAspect() {
+    GaugeAspect customAspect = new GaugeAspect(
+        new SimpleMeterRegistry(), null, null);
+    contextRunner
+        .withBean(GaugeAspect.class, () -> customAspect)
+        .run(
+            context -> {
+              assertThat(context).hasSingleBean(GaugeAspect.class);
+              assertThat(context.getBean(GaugeAspect.class)).isSameAs(customAspect);
             });
   }
 }
