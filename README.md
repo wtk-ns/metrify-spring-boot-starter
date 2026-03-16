@@ -19,7 +19,7 @@ Add the dependency:
 <dependency>
   <groupId>io.wouns</groupId>
   <artifactId>metrify-spring-boot-starter</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 

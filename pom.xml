@@ -11,7 +11,7 @@
 
   <groupId>io.wouns</groupId>
   <artifactId>metrify-spring-boot-starter</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>metrify-spring-boot-starter</name>
   <description>Annotation-based Micrometer metrics exporter for Spring Boot</description>
 
