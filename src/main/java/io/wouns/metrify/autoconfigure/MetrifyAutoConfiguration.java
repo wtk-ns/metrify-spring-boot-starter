@@ -1,8 +1,10 @@
 package io.wouns.metrify.autoconfigure;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.wouns.metrify.aspect.CounterAspect;
 import io.wouns.metrify.aspect.GaugeAspect;
 import io.wouns.metrify.aspect.MetricGaugeBeanPostProcessor;
+import io.wouns.metrify.aspect.SummaryAspect;
 import io.wouns.metrify.configuration.MetrifyProperties;
 import io.wouns.metrify.service.MetricNameResolver;
 import io.wouns.metrify.service.TagExtractor;
@@ -56,6 +58,24 @@ public class MetrifyAutoConfiguration {
       MetricNameResolver nameResolver,
       TagExtractor tagExtractor) {
     return new GaugeAspect(registry, nameResolver, tagExtractor);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public CounterAspect metrifyCounterAspect(
+      MeterRegistry registry,
+      MetricNameResolver nameResolver,
+      TagExtractor tagExtractor) {
+    return new CounterAspect(registry, nameResolver, tagExtractor);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public SummaryAspect metrifySummaryAspect(
+      MeterRegistry registry,
+      MetricNameResolver nameResolver,
+      TagExtractor tagExtractor) {
+    return new SummaryAspect(registry, nameResolver, tagExtractor);
   }
 
   @Bean
