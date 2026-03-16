@@ -9,11 +9,15 @@
     <relativePath/>
   </parent>
 
-  <groupId>io.wouns</groupId>
+  <groupId>io.github.wtk-ns</groupId>
   <artifactId>metrify-spring-boot-starter</artifactId>
   <version>1.0.0</version>
+  <packaging>jar</packaging>
   <name>metrify-spring-boot-starter</name>
-  <description>Annotation-based Micrometer metrics exporter for Spring Boot</description>
+  <description>
+    Annotation-driven Micrometer metrics for Spring Boot.
+    MetricGauge, MetricCounter, MetricSummary with dynamic SpEL tags and reactive support.
+  </description>
 
   <url>https://github.com/wtk-ns/metrify-spring-boot-starter</url>
 
@@ -21,6 +25,7 @@
     <license>
       <name>Apache License, Version 2.0</name>
       <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
 
@@ -33,9 +38,10 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/wtk-ns/metrify-spring-boot-starter.git</connection>
-    <developerConnection>scm:git:ssh://github.com:wtk-ns/metrify-spring-boot-starter.git</developerConnection>
+    <connection>scm:git:https://github.com/wtk-ns/metrify-spring-boot-starter.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/wtk-ns/metrify-spring-boot-starter.git</developerConnection>
     <url>https://github.com/wtk-ns/metrify-spring-boot-starter</url>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
@@ -140,40 +146,32 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>3.2.8</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.10.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+          <autoPublish>true</autoPublish>
+          <waitUntil>published</waitUntil>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.2.8</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.sonatype.central</groupId>
-            <artifactId>central-publishing-maven-plugin</artifactId>
-            <version>0.10.0</version>
-            <extensions>true</extensions>
-            <configuration>
-              <publishingServerId>central</publishingServerId>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>

@@ -17,7 +17,7 @@ Add the dependency:
 
 ```xml
 <dependency>
-  <groupId>io.wouns</groupId>
+  <groupId>io.github.wtk-ns</groupId>
   <artifactId>metrify-spring-boot-starter</artifactId>
   <version>1.0.0</version>
 </dependency>
