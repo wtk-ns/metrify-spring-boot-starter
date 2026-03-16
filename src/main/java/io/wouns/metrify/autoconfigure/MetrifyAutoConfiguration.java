@@ -2,6 +2,7 @@ package io.wouns.metrify.autoconfigure;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.wouns.metrify.aspect.BusinessMetricAspect;
+import io.wouns.metrify.aspect.CachedGaugeAspect;
 import io.wouns.metrify.aspect.CounterAspect;
 import io.wouns.metrify.aspect.GaugeAspect;
 import io.wouns.metrify.aspect.MetricGaugeBeanPostProcessor;
@@ -86,6 +87,15 @@ public class MetrifyAutoConfiguration {
       MetricNameResolver nameResolver,
       TagExtractor tagExtractor) {
     return new BusinessMetricAspect(registry, nameResolver, tagExtractor);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean
+  public CachedGaugeAspect metrifyCachedGaugeAspect(
+      MeterRegistry registry,
+      MetricNameResolver nameResolver,
+      TagExtractor tagExtractor) {
+    return new CachedGaugeAspect(registry, nameResolver, tagExtractor);
   }
 
   @Bean
