@@ -5,6 +5,19 @@ Annotation-based [Micrometer](https://micrometer.io/) metrics exporter for Sprin
 Fills the gap left by Micrometer's intentional refusal to provide `@Gauge` and other
 annotation-driven metric types ([micrometer-metrics/micrometer#451](https://github.com/micrometer-metrics/micrometer/issues/451) — wontfix).
 
+## Try It in 5 Minutes
+
+See it in action with a complete demo app, Prometheus, and Grafana — all pre-configured:
+
+```bash
+cd examples/demo-app/docker
+docker compose up --build
+```
+
+Open [http://localhost:3000](http://localhost:3000) (admin/admin) to see live metrics flowing into a pre-built dashboard.
+
+See the full [demo app documentation](examples/demo-app/README.md) for details.
+
 ## Requirements
 
 - Java 21+
